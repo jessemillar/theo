@@ -1,10 +1,9 @@
-t.setup(35, 35, 15, 15, '7FDBFF', '39CCCC', 50)
+t.setup(32, 32, 15, 15, '7FDBFF', '39CCCC', 50)
 t.calculate.grid()
 t.start()
 
 updateUI() // Initial update of UI values
 
-t.block = 1
 var tool
 penTool()
 
@@ -58,13 +57,14 @@ function eraserTool()
 	tool = 'eraser'
 }
 
-function openHat()
+function openExport()
 {
-	document.getElementById('hat').style.display = 'pen'
-	hideOverlay()
+	t.export()
+	document.getElementById('export').innerHTML = '[' + t.thingy + ']'
+	document.getElementById('hat').style.display = 'block'
 }
 
-function closeHat()
+function closeExport()
 {
 	document.getElementById('hat').style.display = 'none'
 }

@@ -5,6 +5,7 @@ t.grid.x = new Array() // Put x coordinates here
 t.grid.y = new Array() // Put y coordinates here
 
 t.database = new Object()
+t.thingy = new Array()
 
 t.setup = function(tileWidth, tileHeight, width, height, backgroundColor, gridColor, gridOpacity)
 {
@@ -202,9 +203,23 @@ t.calculate.grid = function()
     }
 }
 
-t.calculate.fill = function(row, column, similar)
+t.export = function()
 {
-	// Calculate the bucket tool's "domain" that it will fill
+	t.thingy.length = 0 // Wipe the array
+	t.thingy.length = t.grid.height * t.grid.width
+
+	for (var i = 0; i < t.thingy.length; i++)
+	{
+		t.thingy[i] = 0
+	}
+
+	for (var i = 0; i < t.grid.height; i++)
+	{
+		for (var j = 0; j < t.grid.width; j++)
+		{
+			// t.thingy[i * j] = t.database['row' + i]['column' + j]
+		}
+	}
 }
 
 t.draw = new Object() // Group the draw functions
