@@ -1,68 +1,70 @@
-t = new Object() // Group everything here
+var dom
+var ctx
+var loop
+var color
+var grid
 
-t.grid = new Object()
-t.grid.x = new Array() // Put x coordinates here
-t.grid.y = new Array() // Put y coordinates here
+var database = new Object()
+var thingy = new Array()
 
-t.database = new Object()
-t.thingy = new Array()
-
-t.setup = function(tileWidth, tileHeight, width, height, backgroundColor, gridColor, gridOpacity)
+function setup(width, height, tileWidth, tileHeight, backgroundColor, gridColor, gridOpacity)
 {
-	t.dom = document.getElementById('canvas')
-    t.ctx = document.getElementById('canvas').getContext('2d')
+	dom = document.getElementById('canvas')
+    ctx = document.getElementById('canvas').getContext('2d')
 
-    document.onmousemove = t.mouse.moved
-	t.dom.setAttribute('onmousedown', 't.mouse.click(event)')
-	t.dom.setAttribute('onmouseup', 't.mouse.cancel()')
-	document.body.setAttribute('onkeydown', 't.keyboard.pressed(event)')
-    document.body.setAttribute('onkeyup', 't.keyboard.cancel(event)')
+	dom.setAttribute('onmousedown', 'mouse.click(event)')
+	dom.setAttribute('onmouseup', 'mouse.cancel()')
 
-    document.body.setAttribute('onresize', 't.calculate.canvas()')
+	document.onmousemove = mouse.moved
 
-	t.color = backgroundColor
-	t.grid = new Object()
-		t.grid.width = width
-		t.grid.height = height
-		t.grid.tile = new Object()
-			t.grid.tile.width = tileWidth
-			t.grid.tile.height = tileHeight
-		t.grid.color = gridColor
-		t.grid.opacity = gridOpacity / 100
+    document.body.setAttribute('onresize', 'calculate.canvas()')
 
-	t.calculate.canvas()
+	color = backgroundColor
+	grid = new Object()
+		grid.width = width
+		grid.height = height
+		grid.tile = new Object()
+			grid.tile.width = tileWidth
+			grid.tile.height = tileHeight
+		grid.color = gridColor
+		grid.opacity = gridOpacity / 100
+
+	calculate.canvas()
+
+	calculate.grid()
+	loop = setInterval(main, 1000 / 60)
+
+	updateUI() // Initial update of UI values
+
+	var tool
+	penTool() // Set the tool initially to the pen
 }
 
-t.start = function()
+mouse = new Object()
+mouse.click = new Object()
+
+mouse.click = function()
 {
-	t.loop = setInterval(main, 1000 / 60)
+	mouse.clicked = true
 }
 
-t.mouse = new Object()
-t.mouse.click = new Object()
-
-t.mouse.click = function()
+mouse.cancel = function()
 {
-	t.mouse.clicked = true
+	mouse.clicked = false
 }
 
-t.mouse.cancel = function()
-{
-	t.mouse.clicked = false
-}
-
-t.mouse.moved = function(event)
+mouse.moved = function(event)
 {
     if (event)
     {
-    	t.mouse.x = event.clientX - t.dom.offsetLeft + document.body.scrollLeft
-    	t.mouse.y = event.clientY - t.dom.offsetTop + document.body.scrollTop
+    	mouse.x = event.clientX - dom.offsetLeft + document.body.scrollLeft
+    	mouse.y = event.clientY - dom.offsetTop + document.body.scrollTop
     }
 }
 
-t.mouse.inside = function()
+mouse.inside = function()
 {
-	if (t.mouse.x > 0 && t.mouse.x < t.dom.offsetLeft + t.dom.offsetWidth && t.mouse.y > 0 && t.mouse.y < t.dom.offsetTop + t.dom.offsetHeight)
+	if (mouse.x > 0 && mouse.x < dom.offsetLeft + dom.offsetWidth && mouse.y > 0 && mouse.y < dom.offsetTop + dom.offsetHeight)
 	{
 		return true
 	}
@@ -72,238 +74,177 @@ t.mouse.inside = function()
 	}
 }
 
-t.keyboard = new Object()
+calculate = new Object() // Group the calculation functions
 
-t.keyboard.pressed = function(event)
+calculate.canvas = function()
 {
-    if (event.keyCode == 32)
-    {
-        t.keyboard.space = true
-    }
-
-    if (event.keyCode == 49)
-    {
-        t.keyboard.one = true
-    }
-
-    if (event.keyCode == 50)
-    {
-        t.keyboard.two = true
-    }
-
-    if (event.keyCode == 51)
-    {
-        t.keyboard.three = true
-    }
-}
-
-t.keyboard.cancel = function(event)
-{
-    if (event.keyCode == 32)
-    {
-        t.keyboard.space = false
-    }
-
-    if (event.keyCode == 49)
-    {
-        t.keyboard.one = false
-    }
-
-    if (event.keyCode == 50)
-    {
-        t.keyboard.two = false
-    }
-
-    if (event.keyCode == 51)
-    {
-        t.keyboard.three = false
-    }
-}
-
-t.calculate = new Object() // Group the calculation functions
-
-t.calculate.canvas = function()
-{
-	if (!t.canvas)
+	if (!canvas)
 	{
-		t.canvas = new Object()
+		canvas = new Object()
 	}
 
 	// Userful for later calculation
-	t.canvas.width = t.grid.width * t.grid.tile.width
-	t.canvas.height = t.grid.height * t.grid.tile.height
+	canvas.width = grid.width * grid.tile.width
+	canvas.height = grid.height * grid.tile.height
 
-	if (t.canvas.width >= window.innerWidth) // Make the toolbar always fill the top of the screen
+	if (canvas.width >= window.innerWidth) // Make the toolbar always fill the top of the screen
 	{
-		document.getElementById('toolbar').style.width = t.canvas.width
+		document.getElementById('toolbar').style.width = canvas.width
 	}
 	else
 	{
 		document.getElementById('toolbar').style.width = '100%'
 	}
 
-	if (t.canvas.width >= window.innerWidth && t.canvas.height >= window.innerHeight - 50)
+	if (canvas.width >= window.innerWidth && canvas.height >= window.innerHeight - 50)
 	{
-		document.body.style.background = t.color // A preventative measure for screen flicker on resize
-		t.dom.style.left = 0
-	    t.dom.style.top = 50 // Leave room for the toolbar
-		t.dom.width = t.canvas.width
-	    t.dom.height = t.canvas.height
+		document.body.style.background = color // A preventative measure for screen flicker on resize
+		dom.style.left = 0
+	    dom.style.top = 50 // Leave room for the toolbar
+		dom.width = canvas.width
+	    dom.height = canvas.height
 	}
 	else
 	{
-		if (t.canvas.width >= window.innerWidth)
+		if (canvas.width >= window.innerWidth)
 		{
 			document.body.style.background = '#111111'
-			t.dom.width = t.canvas.width
-	    	t.dom.height = t.canvas.height
-	    	t.dom.style.left = 0
-	    	t.dom.style.top = (window.innerHeight - 50) / 2 - t.dom.height / 2 + 50
+			dom.width = canvas.width
+	    	dom.height = canvas.height
+	    	dom.style.left = 0
+	    	dom.style.top = (window.innerHeight - 50) / 2 - dom.height / 2 + 50
 		}
-		else if (t.canvas.height >= window.innerHeight - 50)
+		else if (canvas.height >= window.innerHeight - 50)
 		{
 			document.body.style.background = '#111111'
-			t.dom.width = t.canvas.width
-	    	t.dom.height = t.canvas.height
-	    	t.dom.style.left = window.innerWidth / 2 - t.dom.width / 2
-	    	t.dom.style.top = 50
+			dom.width = canvas.width
+	    	dom.height = canvas.height
+	    	dom.style.left = window.innerWidth / 2 - dom.width / 2
+	    	dom.style.top = 50
 		}
 		else
 		{
 			document.body.style.background = '#111111'
-			t.dom.width = t.canvas.width
-	    	t.dom.height = t.canvas.height
-	    	t.dom.style.left = window.innerWidth / 2 - t.dom.width / 2
-	    	t.dom.style.top = (window.innerHeight - 50) / 2 - t.dom.height / 2 + 50
+			dom.width = canvas.width
+	    	dom.height = canvas.height
+	    	dom.style.left = window.innerWidth / 2 - dom.width / 2
+	    	dom.style.top = (window.innerHeight - 50) / 2 - dom.height / 2 + 50
 		}
 	}
 
-	t.calculate.grid()
+	calculate.grid()
 }
 
-t.calculate.grid = function()
+calculate.grid = function()
 {
-    for (var y = 0; y < t.grid.height; y++)
+    for (var y = 0; y < grid.height; y++)
     {
-        for (var x = 0; x < t.grid.width; x++)
+        for (var x = 0; x < grid.width; x++)
         {
-            if (!t.database['row' + y])
+            if (!database['row' + y])
             {
-                t.database['row' + y] = new Object()
+                database['row' + y] = new Object()
             }
 
-            if (!t.database['row' + y]['column' + x])
+            if (!database['row' + y]['column' + x])
             {
-                t.database['row' + y]['column' + x] = new Object()
+                database['row' + y]['column' + x] = new Object()
             }
 
-            t.database['row' + y]['column' + x].x = 0 - t.grid.width / 2 * t.grid.tile.width + x * t.grid.tile.width
-            t.database['row' + y]['column' + x].y = 0 - t.grid.height / 2 * t.grid.tile.height + y * t.grid.tile.height
+            database['row' + y]['column' + x].x = 0 - grid.width / 2 * grid.tile.width + x * grid.tile.width
+            database['row' + y]['column' + x].y = 0 - grid.height / 2 * grid.tile.height + y * grid.tile.height
         }
     }
 }
 
-t.export = function()
+function exportArray()
 {
-	t.thingy.length = 0 // Wipe the array
-	t.thingy.length = t.grid.height * t.grid.width
-
-	for (var i = 0; i < t.thingy.length; i++)
-	{
-		t.thingy[i] = 0
-	}
-
-	for (var i = 0; i < t.grid.height; i++)
-	{
-		for (var j = 0; j < t.grid.width; j++)
-		{
-			// t.thingy[i * j] = t.database['row' + i]['column' + j]
-		}
-	}
+	thingy.length = 0 // Wipe the array
+	thingy.length = grid.height * grid.width
 }
 
-t.draw = new Object() // Group the draw functions
+draw = new Object() // Group the draw functions
 
-t.draw.clear = function()
+draw.clear = function()
 {
-	t.ctx.fillStyle = '#' + t.color
-	t.ctx.fillRect(0, 0, t.dom.width, t.dom.height)
+	ctx.fillStyle = '#' + color
+	ctx.fillRect(0, 0, dom.width, dom.height)
 }
 
-t.draw.line = function(x1, y1, x2, y2, width, color, opacity, dash)
+draw.line = function(x1, y1, x2, y2, width, color, opacity, dash)
 {
 	if (opacity > 0)
 	{
-		t.ctx.beginPath()
-		t.ctx.moveTo(Math.round(x1) + 0.5, Math.round(y1) + 0.5)
-		t.ctx.lineTo(Math.round(x2) + 0.5, Math.round(y2) + 0.5)
-		t.ctx.lineWidth = width
-		t.ctx.strokeStyle = '#' + color
+		ctx.beginPath()
+		ctx.moveTo(Math.round(x1) + 0.5, Math.round(y1) + 0.5)
+		ctx.lineTo(Math.round(x2) + 0.5, Math.round(y2) + 0.5)
+		ctx.lineWidth = width
+		ctx.strokeStyle = '#' + color
 		if (dash)
 		{
-			t.ctx.setLineDash([dash])
+			ctx.setLineDash([dash])
 		}
 		if (opacity)
 		{
-			t.ctx.globalAlpha = opacity
+			ctx.globalAlpha = opacity
 		}
 		else
 		{
-			t.ctx.globalAlpha = 1
+			ctx.globalAlpha = 1
 		}
-		t.ctx.stroke()
+		ctx.stroke()
 	}
 }
 
-t.draw.rectangle = function(x, y, width, height, color, opacity)
+draw.rectangle = function(x, y, width, height, color, opacity)
 {
 	if (opacity > 0)
 	{
-		t.ctx.beginPath()
-		t.ctx.rect(x, y, width, height)
-		t.ctx.fillStyle = color
+		ctx.beginPath()
+		ctx.rect(x, y, width, height)
+		ctx.fillStyle = color
 		if (opacity)
 		{
-			t.ctx.globalAlpha = opacity
+			ctx.globalAlpha = opacity
 		}
 		else
 		{
-			t.ctx.globalAlpha = 1
+			ctx.globalAlpha = 1
 		}
-		t.ctx.fill()
+		ctx.fill()
 	}
 }
 
-t.draw.grid = function()
+draw.grid = function()
 {
-	for (var i = 1; i < t.grid.width; i++)
+	for (var i = 1; i < grid.width; i++)
 	{
-		t.draw.line(i * t.grid.tile.width, 0, i * t.grid.tile.width, t.canvas.height, 1, t.grid.color, t.grid.opacity, 4)
+		draw.line(i * grid.tile.width, 0, i * grid.tile.width, canvas.height, 1, grid.color, grid.opacity, 4)
 	}
 
-	for (var i = 1; i < t.grid.height; i++)
+	for (var i = 1; i < grid.height; i++)
 	{
-		t.draw.line(0, i * t.grid.tile.height, t.canvas.width, i * t.grid.tile.height, 1, t.grid.color, t.grid.opacity, 4)
+		draw.line(0, i * grid.tile.height, canvas.width, i * grid.tile.height, 1, grid.color, grid.opacity, 4)
 	}
 
-	for (var i = 0; i < t.grid.height; i++)
+	for (var i = 0; i < grid.height; i++)
 	{
-		for (var j = 0; j < t.grid.width; j++)
+		for (var j = 0; j < grid.width; j++)
 		{
-			t.draw.rectangle(j * t.grid.tile.width + t.grid.tile.width / 2, i * t.grid.tile.height + t.grid.tile.height / 2, 1, 1, t.grid.color, t.grid.opacity)
+			draw.rectangle(j * grid.tile.width + grid.tile.width / 2, i * grid.tile.height + grid.tile.height / 2, 1, 1, grid.color, grid.opacity)
 		}
 	}
 }
 
-t.draw.objects = function()
+draw.objects = function()
 {
-	for (var i = 0; i < t.grid.height; i++)
+	for (var i = 0; i < grid.height; i++)
 	{
-		for (var j = 0; j < t.grid.width; j++)
+		for (var j = 0; j < grid.width; j++)
 		{
-			if (t.database['row' + i]['column' + j] == 1)
+			if (database['row' + i]['column' + j] == 1)
 			{
-				t.draw.rectangle(j * t.grid.tile.width, i * t.grid.tile.height, t.grid.tile.width, t.grid.tile.height, '#ff0000', 1)
+				draw.rectangle(j * grid.tile.width, i * grid.tile.height, grid.tile.width, grid.tile.height, '#ff0000', 1)
 			}
 		}
 	}

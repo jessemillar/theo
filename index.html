@@ -67,6 +67,18 @@
 					resize: none;
 				}
 
+			#tileset
+			{
+				position: fixed;
+				left: 0px;
+				bottom: 0px;
+				width: 300px;
+				height: 100px;
+
+				background-color: #85144B;
+				z-index: 1;
+			}
+
 			#tools
 			{
 				position: fixed;
@@ -163,6 +175,8 @@
 			<textarea id = "export"></textarea>
 		</div>
 
+		<div id = "tileset" style = "display: none"></div>
+
 		<div id = "tools">
 			<div class = "button" onclick = "penTool()">pen</div>
 			<div class = "button" onclick = "eraserTool()">eraser</div>
@@ -184,4 +198,5 @@
 	</body>
 	<script src = "backend.js"></script>
 	<script src = "main.js"></script>
+	<script src = "interface.js"></script>
 </html>
