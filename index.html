@@ -1,202 +1,173 @@
 <html>
-	<head>
-		<title>Theo</title>
-		<style>
-			@font-face
-			{
-				font-family: 'minercraftory';
-				src: url('minercraftory.ttf');
-			}
 
-			body
-			{
-				margin: 0px;
-				padding: 0px;
+<head>
+    <title>Theo</title>
+    <style>
+    @font-face {
+        font-family: 'minercraftory';
+        src: url('minercraftory.ttf');
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #111111;
+        overflow-x: hidden;
+    }
+    
+    #canvas {
+        position: absolute;
+        left: 0px;
+        top: 50px;
+        z-index: 0;
+    }
+    
+    #hat {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 400px;
+        height: 400px;
+        margin-left: -200px;
+        margin-top: -200px;
+        background-color: #85144B;
+        display: none;
+        z-index: 2;
+    }
+    
+    #close {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        color: #FFFFFF;
+        cursor: pointer;
+        font-family: "MinercraftoryRegular";
+        font-size: 15px;
+        text-align: right;
+    }
+    
+    #export {
+        position: absolute;
+        left: 15px;
+        top: 40px;
+        width: 370px;
+        height: 345px;
+        background-color: #FFFFFF;
+        resize: none;
+    }
+    
+    #tileset {
+        position: fixed;
+        left: 0px;
+        bottom: 0px;
+        width: 300px;
+        height: 100px;
+        background-color: #85144B;
+        z-index: 1;
+    }
+    
+    #tools {
+        position: fixed;
+        right: 0px;
+        bottom: 0px;
+        width: 110px;
+        height: auto;
+        background-color: #85144B;
+        z-index: 1;
+    }
+    
+    #tools .button {
+        margin-bottom: 17px;
+        margin-top: 10px;
+        color: #FFDC00;
+        cursor: pointer;
+        font-family: "MinercraftoryRegular";
+        font-size: 17px;
+        text-align: center;
+    }
+    
+    #toolbar {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 50px;
+        background-color: #85144B;
+        color: #FFFFFF;
+        font-family: "MinercraftoryRegular";
+        z-index: 1;
+    }
+    
+    #toolbar .save {
+        margin-top: 5px;
+        margin-left: 10px;
+        margin-right: 10px;
+        color: #FFDC00;
+        cursor: pointer;
+        display: block;
+        float: left;
+        font-family: inherit;
+        font-size: 24px;
+        text-align: center;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    #toolbar input {
+        height: 30px;
+        margin-left: 10px;
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #FFFFFF;
+        border: none;
+        color: #85144B;
+        display: block;
+        float: left;
+        font-family: inherit;
+        font-size: 15px;
+        outline: none;
+        text-align: center;
+        text-transform: lowercase;
+    }
+    
+    #toolbar .small-input {
+        width: 56px;
+    }
+    
+    #toolbar .large-input {
+        width: 95px;
+    }
+    </style>
+</head>
 
-				background-color: #111111;
-				overflow-x: hidden;
-			}
+<body>
+    <div id="hat">
+        <div id="close" onclick="closeExport()">close</div>
+        <textarea id="export"></textarea>
+    </div>
+    <div id="tileset" style="display: none"></div>
+    <div id="tools">
+        <div class="button" onclick="penTool()">pen</div>
+        <div class="button" onclick="eraserTool()">eraser</div>
+        <div class="button" onclick="bucketTool()">bucket</div>
+    </div>
+    <div id="toolbar">
+        <div class="save" onclick="openExport()">save</div>
+        <input id="grid-width" class="small-input" type="text" title="Grid Width" onchange="updatePreferences()" onclick="this.select()">
+        <input id="grid-height" class="small-input" type="text" title="Grid Height" onchange="updatePreferences()" onclick="this.select()">
+        <input id="tile-width" class="small-input" style="background-color: #DDDDDD" type="text" title="Tile Width" onchange="updatePreferences()" onclick="this.select()">
+        <input id="tile-height" class="small-input" style="background-color: #DDDDDD" type="text" title="Tile Height" onchange="updatePreferences()" onclick="this.select()">
+        <input id="background-color" class="large-input" type="text" title="Background Color" onchange="updatePreferences()" onclick="this.select()">
+        <input id="grid-color" class="large-input" type="text" title="Grid Color" onchange="updatePreferences()" onclick="this.select()">
+        <input id="grid-opacity" class="small-input" type="text" title="Grid Opacity" onchange="updatePreferences()" onclick="this.select()">
+    </div>
+    <canvas id="canvas" width="300px" height="300px"></canvas>
+</body>
+<script src="backend.js"></script>
+<script src="main.js"></script>
+<script src="interface.js"></script>
 
-			#canvas
-			{
-				position: absolute;
-				left: 0px;
-				top: 50px;
-
-				z-index: 0;
-			}
-
-			#hat
-			{
-				position: fixed;
-				left: 50%;
-				top: 50%;
-				width: 400px;
-				height: 400px;
-
-				margin-left: -200px;
-				margin-top: -200px;
-
-				background-color: #85144B;
-				display: none;
-				z-index: 2;
-			}
-
-				#close
-				{
-					position: absolute;
-					right: 15px;
-					top: 10px;
-
-					color: #FFFFFF;
-					cursor: pointer;
-					font-family: "MinercraftoryRegular";
-					font-size: 15px;
-					text-align: right;
-				}
-
-				#export
-				{
-					position: absolute;
-					left: 15px;
-					top: 40px;
-					width: 370px;
-					height: 345px;
-
-					background-color: #FFFFFF;
-					resize: none;
-				}
-
-			#tileset
-			{
-				position: fixed;
-				left: 0px;
-				bottom: 0px;
-				width: 300px;
-				height: 100px;
-
-				background-color: #85144B;
-				z-index: 1;
-			}
-
-			#tools
-			{
-				position: fixed;
-				right: 0px;
-				bottom: 0px;
-				width: 110px;
-				height: auto;
-
-				background-color: #85144B;
-				z-index: 1;
-			}
-
-				#tools .button
-				{
-					margin-bottom: 17px;
-					margin-top: 10px;
-
-					color: #FFDC00;
-					cursor: pointer;
-					font-family: "MinercraftoryRegular";
-					font-size: 17px;
-					text-align: center;
-				}
-
-			#toolbar
-			{
-				position: absolute;
-				left: 0px;
-				top: 0px;
-				width: 100%;
-				height: 50px;
-
-				background-color: #85144B;
-				color: #FFFFFF;
-				font-family: "MinercraftoryRegular";
-				z-index: 1;
-			}
-
-				#toolbar .save
-				{
-					margin-top: 5px;
-					margin-left: 10px;
-					margin-right: 10px;
-
-					color: #FFDC00;
-					cursor: pointer;
-					display: block;
-					float: left;
-					font-family: inherit;
-					font-size: 24px;
-					text-align: center;
-
-					-webkit-user-select: none;
-					-khtml-user-select: none;
-					-moz-user-select: none;
-					-ms-user-select: none;
-					user-select: none;
-				}
-
-				#toolbar input
-				{
-					height: 30px;
-
-					margin-left: 10px;
-					margin-top: 10px;
-					padding: 10px;
-
-					background-color: #FFFFFF;
-					border: none;
-					color: #85144B;
-					display: block;
-					float: left;
-					font-family: inherit;
-					font-size: 15px;
-					outline: none;
-					text-align: center;
-					text-transform: lowercase;
-				}
-
-				#toolbar .small-input
-				{
-					width: 56px;
-				}
-
-				#toolbar .large-input
-				{
-					width: 95px;
-				}
-		</style>
-	</head>
-	<body>
-		<div id = "hat">
-			<div id = "close" onclick = "closeExport()">close</div>
-			<textarea id = "export"></textarea>
-		</div>
-
-		<div id = "tileset" style = "display: none"></div>
-
-		<div id = "tools">
-			<div class = "button" onclick = "penTool()">pen</div>
-			<div class = "button" onclick = "eraserTool()">eraser</div>
-			<div class = "button" onclick = "bucketTool()">bucket</div>
-		</div>
-
-		<div id = "toolbar">
-			<div class = "save" onclick = "openExport()">save</div>
-			<input id = "grid-width" class = "small-input" type = "text" title = "Grid Width" onchange = "updatePreferences()" onclick = "this.select()">
-			<input id = "grid-height" class = "small-input" type = "text" title = "Grid Height" onchange = "updatePreferences()" onclick = "this.select()">
-			<input id = "tile-width" class = "small-input" style = "background-color: #DDDDDD" type = "text" title = "Tile Width" onchange = "updatePreferences()" onclick = "this.select()">
-			<input id = "tile-height" class = "small-input" style = "background-color: #DDDDDD" type = "text" title = "Tile Height" onchange = "updatePreferences()" onclick = "this.select()">
-			<input id = "background-color" class = "large-input" type = "text" title = "Background Color" onchange = "updatePreferences()" onclick = "this.select()">
-			<input id = "grid-color" class = "large-input" type = "text" title = "Grid Color" onchange = "updatePreferences()" onclick = "this.select()">
-			<input id = "grid-opacity" class = "small-input" type = "text" title = "Grid Opacity" onchange = "updatePreferences()" onclick = "this.select()">
-		</div>
-
-		<canvas id = "canvas" width = "300px" height = "300px"></canvas>
-	</body>
-	<script src = "backend.js"></script>
-	<script src = "main.js"></script>
-	<script src = "interface.js"></script>
 </html>

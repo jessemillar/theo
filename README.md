@@ -1,5 +1,3 @@
-Discontinued as of now.
-
 Theo
 ====
 
